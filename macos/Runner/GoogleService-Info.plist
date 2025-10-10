@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDlbu-Elt4DII16zIWIxL2BRa6cFxt8Ayk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>879583028035</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.moreiras.moreirasSportsApp</string>
+	<key>PROJECT_ID</key>
+	<string>moreiras-sports-app</string>
+	<key>STORAGE_BUCKET</key>
+	<string>moreiras-sports-app.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:879583028035:ios:3a3c8d8c082e3a904905f6</string>
+</dict>
+</plist>

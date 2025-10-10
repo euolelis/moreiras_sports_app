@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "879583028035",
+    "project_id": "moreiras-sports-app",
+    "storage_bucket": "moreiras-sports-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:879583028035:android:852acc00ea6256254905f6",
+        "android_client_info": {
+          "package_name": "com.moreiras.moreiras_sports_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlDp0kj49eBcYz4e6lHLDpNkn7NZ9P0OE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
