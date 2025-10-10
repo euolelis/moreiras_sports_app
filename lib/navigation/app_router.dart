@@ -10,10 +10,13 @@ import '../features/admin/screens/admin_dashboard_screen.dart';
 import '../features/admin/screens/manage_players_screen.dart';
 import '../features/admin/screens/add_edit_player_screen.dart';
 
-// --- NOVOS IMPORTS PARA O SHELLROUTE ---
+// Imports para o ShellRoute
 import '../shared/widgets/main_scaffold.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/players/screens/player_list_screen.dart';
+import '../features/players/screens/player_detail_screen.dart';
+// --- NOVO IMPORT PARA A SPLASH SCREEN ---
+import '../features/splash/screens/splash_screen.dart';
 
 
 // Provider que expõe o estado de autenticação (sem alterações)
@@ -25,34 +28,43 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash', // <-- MUDANÇA AQUI
     refreshListenable: GoRouterRefreshStream(ref.watch(authStateProvider.stream)),
 
-    // --- SEÇÃO DE ROTAS REESTRUTURADA COM SHELLROUTE ---
     routes: [
+      // --- ROTA DA SPLASH SCREEN ---
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+
       // --- ROTAS PÚBLICAS DENTRO DO SHELL ---
-      // Todas as rotas aqui dentro serão exibidas dentro do MainScaffold
       ShellRoute(
         builder: (context, state, child) {
-          // 'child' é a tela da rota atual (HomeScreen ou PlayerListScreen)
           return MainScaffold(child: child);
         },
         routes: [
           GoRoute(
             path: '/',
-            // A antiga tela temporária foi substituída pela HomeScreen real
             builder: (context, state) => const HomeScreen(),
           ),
           GoRoute(
             path: '/players',
             builder: (context, state) => const PlayerListScreen(),
+            routes: [
+              GoRoute(
+                path: ':playerId',
+                builder: (context, state) {
+                  final playerId = state.pathParameters['playerId']!;
+                  return PlayerDetailScreen(playerId: playerId);
+                },
+              ),
+            ],
           ),
-          // Você poderá adicionar a rota de detalhes do jogador aqui no futuro
         ],
       ),
 
       // --- ROTAS FORA DO SHELL (TELA CHEIA) ---
-      // Estas rotas não usam o MainScaffold e ocupam a tela inteira.
       GoRoute(
         path: '/admin-login',
         builder: (context, state) => const AdminLoginScreen(),
@@ -60,7 +72,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin',
         builder: (context, state) => const AdminDashboardScreen(),
-        // As sub-rotas do admin continuam as mesmas
         routes: [
           GoRoute(
             path: 'manage-players',

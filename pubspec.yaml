@@ -30,9 +30,15 @@ dependencies:
   intl: ^0.19.0 # Para datas
   image_picker: ^1.0.7 # Para upload de imagens pelo admin
   cached_network_image: ^3.3.1 # Para exibir imagens da internet com cache
+  lottie: ^3.3.2
 
 # Se você tiver dependências de desenvolvimento, elas viriam aqui, também alinhadas à esquerda
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+
+
+assets:
+    - assets/images/
+    - assets/animations/
