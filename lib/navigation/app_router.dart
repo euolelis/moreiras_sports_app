@@ -1,84 +1,111 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // 1. Importe o Firebase Auth
 
-// Importe os serviços e telas necessários
+// Imports das telas e serviços
 import '../core/services/auth_service.dart';
 import '../features/auth/screens/admin_login_screen.dart';
-import '../features/admin/screens/admin_dashboard_screen.dart'; // 2. Importe a nova tela de dashboard
+import '../features/admin/screens/admin_dashboard_screen.dart';
+import '../features/admin/screens/manage_players_screen.dart';
+import '../features/admin/screens/add_edit_player_screen.dart';
 
-// 3. Crie este provider para observar o estado de autenticação em tempo real
+// --- NOVOS IMPORTS PARA O SHELLROUTE ---
+import '../shared/widgets/main_scaffold.dart';
+import '../features/home/screens/home_screen.dart';
+import '../features/players/screens/player_list_screen.dart';
+
+
+// Provider que expõe o estado de autenticação (sem alterações)
 final authStateProvider = StreamProvider<User?>((ref) {
-  // Ele "escuta" as mudanças no serviço de autenticação
   return ref.watch(authServiceProvider).authStateChanges;
 });
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  // 4. Observa o estado de autenticação para usar nos redirecionamentos
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
     initialLocation: '/',
-    
-    // 5. Adicione o refreshListenable para que o router reavalie as rotas
-    // quando o estado de login/logout mudar.
-    refreshListenable: GoRouterRefreshStream(authState.stream),
-    
+    refreshListenable: GoRouterRefreshStream(ref.watch(authStateProvider.stream)),
+
+    // --- SEÇÃO DE ROTAS REESTRUTURADA COM SHELLROUTE ---
     routes: [
-      // Rota Pública
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const Scaffold(appBar: null, body: Center(child: Text("Home Screen"))), // Tela temporária
+      // --- ROTAS PÚBLICAS DENTRO DO SHELL ---
+      // Todas as rotas aqui dentro serão exibidas dentro do MainScaffold
+      ShellRoute(
+        builder: (context, state, child) {
+          // 'child' é a tela da rota atual (HomeScreen ou PlayerListScreen)
+          return MainScaffold(child: child);
+        },
+        routes: [
+          GoRoute(
+            path: '/',
+            // A antiga tela temporária foi substituída pela HomeScreen real
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/players',
+            builder: (context, state) => const PlayerListScreen(),
+          ),
+          // Você poderá adicionar a rota de detalhes do jogador aqui no futuro
+        ],
       ),
-      // Rota de Login do Admin
+
+      // --- ROTAS FORA DO SHELL (TELA CHEIA) ---
+      // Estas rotas não usam o MainScaffold e ocupam a tela inteira.
       GoRoute(
         path: '/admin-login',
         builder: (context, state) => const AdminLoginScreen(),
       ),
-      
-      // 6. --- ROTA PROTEGIDA (Admin) ---
-      // Esta é a nova rota para o painel do admin
       GoRoute(
         path: '/admin',
         builder: (context, state) => const AdminDashboardScreen(),
+        // As sub-rotas do admin continuam as mesmas
+        routes: [
+          GoRoute(
+            path: 'manage-players',
+            builder: (context, state) => const ManagePlayersScreen(),
+          ),
+          GoRoute(
+            path: 'add-player',
+            builder: (context, state) => const AddEditPlayerScreen(),
+          ),
+          GoRoute(
+            path: 'edit-player/:playerId',
+            builder: (context, state) {
+              final playerId = state.pathParameters['playerId']!;
+              return AddEditPlayerScreen(playerId: playerId);
+            },
+          ),
+        ],
       ),
     ],
-
-    // 7. Lógica de redirecionamento para proteger as rotas
+    
+    // A lógica de redirect continua exatamente a mesma
     redirect: (BuildContext context, GoRouterState state) {
-      // Verifica se o usuário está logado (se existe um usuário no stream)
       final isLoggedIn = authState.value != null;
-      
-      // Verifica se a rota que o usuário está tentando acessar é a de login
       final isLoggingIn = state.matchedLocation == '/admin-login';
-      
-      // Verifica se a rota que o usuário está tentando acessar começa com '/admin'
       final isAdminRoute = state.matchedLocation.startsWith('/admin');
 
-      // REGRA 1: Se o usuário NÃO está logado e tenta acessar uma rota de admin...
       if (!isLoggedIn && isAdminRoute) {
-        // ...redireciona ele para a tela de login.
         return '/admin-login';
       }
 
-      // REGRA 2: Se o usuário ESTÁ logado e tenta acessar a tela de login...
       if (isLoggedIn && isLoggingIn) {
-        // ...redireciona ele para o painel, pois ele já está autenticado.
         return '/admin';
       }
 
-      // Se nenhuma das regras acima se aplicar, não faz nenhum redirecionamento.
       return null;
     },
 
+    // O errorBuilder continua o mesmo
     errorBuilder: (context, state) => Scaffold(
       body: Center(child: Text('Página não encontrada: ${state.error}')),
     ),
   );
 });
 
-// 8. Classe auxiliar necessária para o refreshListenable funcionar com o Stream do Firebase
+// Classe auxiliar para o refreshListenable (sem alterações)
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();

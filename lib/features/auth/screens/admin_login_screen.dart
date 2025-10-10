@@ -42,7 +42,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
       // Se o login for bem-sucedido e o widget ainda estiver na tela,
       // navega para a rota '/admin'.
       // (Você criará essa rota no próximo passo do seu tutorial)
-      if (mounted) context.go('/admin');
+     // if (mounted) context.go('/admin');
 
     } catch (e) {
       // Se ocorrer um erro (ex: senha errada, usuário não existe),
