@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // 1. Import para checar se é web
-import 'package:image_picker/image_picker.dart';      // 2. Import do image_picker
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart';
 import '../../../core/models/player_model.dart';
 import '../../../core/services/firestore_service.dart';
-import '../../../core/services/storage_service.dart';   // 3. Import do storage_service
+import '../../../core/services/storage_service.dart';
+import 'manage_categories_screen.dart';
 
 class AddEditPlayerScreen extends ConsumerStatefulWidget {
   final String? playerId;
@@ -24,9 +25,9 @@ class _AddEditPlayerScreenState extends ConsumerState<AddEditPlayerScreen> {
   DateTime? _birthDate;
   bool _isLoading = false;
 
-  // 4. Novas variáveis de estado para a imagem
   XFile? _selectedImageFile;
-  String? _existingPhotoUrl; // Usado para guardar a URL da foto ao editar
+  String? _existingPhotoUrl;
+  String? _selectedCategoryId;
 
   bool get _isEditing => widget.playerId != null;
 
@@ -34,7 +35,7 @@ class _AddEditPlayerScreenState extends ConsumerState<AddEditPlayerScreen> {
   void initState() {
     super.initState();
     if (_isEditing) {
-      // Lógica para carregar dados virá aqui (incluindo _existingPhotoUrl)
+      // TODO: Carregar dados do jogador, incluindo _selectedCategoryId
     }
   }
 
@@ -60,7 +61,6 @@ class _AddEditPlayerScreenState extends ConsumerState<AddEditPlayerScreen> {
     }
   }
 
-  // 5. Nova função para selecionar a imagem da galeria
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -71,9 +71,15 @@ class _AddEditPlayerScreenState extends ConsumerState<AddEditPlayerScreen> {
     }
   }
 
-  // 6. Função _savePlayer MODIFICADA para lidar com o upload
   Future<void> _savePlayer() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    if (_selectedCategoryId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, selecione uma categoria.')),
+      );
+      return;
+    }
     
     if (_birthDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -83,10 +89,9 @@ class _AddEditPlayerScreenState extends ConsumerState<AddEditPlayerScreen> {
     }
 
     setState(() => _isLoading = true);
-    String? photoUrl = _existingPhotoUrl; // Começa com a URL da foto existente (se houver)
+    String? photoUrl = _existingPhotoUrl;
 
     try {
-      // Se uma nova imagem foi selecionada, faz o upload dela para o Storage
       if (_selectedImageFile != null) {
         photoUrl = await ref.read(storageServiceProvider).uploadPlayerImage(_selectedImageFile!);
       }
@@ -97,7 +102,8 @@ class _AddEditPlayerScreenState extends ConsumerState<AddEditPlayerScreen> {
         position: _positionController.text,
         number: int.parse(_numberController.text),
         birthDate: _birthDate!,
-        photoUrl: photoUrl, // Usa a URL da foto (nova ou existente)
+        photoUrl: photoUrl,
+        categoryId: _selectedCategoryId!,
       );
 
       await ref.read(firestoreServiceProvider).setPlayer(player);
@@ -137,12 +143,49 @@ class _AddEditPlayerScreenState extends ConsumerState<AddEditPlayerScreen> {
                   children: [
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Nome Completo'),
+                      decoration: const InputDecoration(labelText: 'Nome Completo', border: OutlineInputBorder()),
                       validator: (value) => (value?.isEmpty ?? true) ? 'Campo obrigatório' : null,
                     ),
                     const SizedBox(height: 16),
 
-                    // 7. --- WIDGET DE UPLOAD DE IMAGEM ADICIONADO ---
+                    // --- DROPDOWN DE CATEGORIAS ATUALIZADO ---
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final categoriesAsyncValue = ref.watch(categoriesStreamProvider);
+                        return categoriesAsyncValue.when(
+                          data: (categories) {
+                            if (_selectedCategoryId != null && !categories.any((c) => c.id == _selectedCategoryId)) {
+                              _selectedCategoryId = null;
+                            }
+                            return DropdownButtonFormField<String>(
+                              value: _selectedCategoryId,
+                              hint: const Text('Selecione a Categoria'),
+                              decoration: const InputDecoration(
+                                labelText: 'Categoria',
+                                border: OutlineInputBorder(), // Adiciona uma borda
+                              ),
+                              items: categories.map((category) {
+                                return DropdownMenuItem(
+                                  value: category.id,
+                                  child: Text(category.name),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedCategoryId = value;
+                                });
+                              },
+                              validator: (value) => value == null ? 'Selecione uma categoria' : null,
+                            );
+                          },
+                          loading: () => const Center(child: CircularProgressIndicator()),
+                          error: (err, stack) => const Text('Erro ao carregar categorias. Cadastre uma primeiro.'),
+                        );
+                      },
+                    ),
+                    // --- FIM DO DROPDOWN ---
+
+                    const SizedBox(height: 16),
                     GestureDetector(
                       onTap: _pickImage,
                       child: Container(
@@ -156,11 +199,9 @@ class _AddEditPlayerScreenState extends ConsumerState<AddEditPlayerScreen> {
                         child: _selectedImageFile != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                // Na web, o path do image_picker é uma URL que pode ser usada com Image.network
-                                // Em mobile, seria Image.file(File(_selectedImageFile!.path))
                                 child: kIsWeb
                                     ? Image.network(_selectedImageFile!.path, fit: BoxFit.cover)
-                                    : Image.asset("assets/placeholder.png"), // Adicione um placeholder para mobile ou implemente a lógica de File
+                                    : Image.asset("assets/placeholder.png"),
                               )
                             : Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -172,18 +213,16 @@ class _AddEditPlayerScreenState extends ConsumerState<AddEditPlayerScreen> {
                               ),
                       ),
                     ),
-                    // --- FIM DO WIDGET ---
-
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _positionController,
-                      decoration: const InputDecoration(labelText: 'Posição (Ex: Atacante)'),
+                      decoration: const InputDecoration(labelText: 'Posição (Ex: Atacante)', border: OutlineInputBorder()),
                       validator: (value) => (value?.isEmpty ?? true) ? 'Campo obrigatório' : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _numberController,
-                      decoration: const InputDecoration(labelText: 'Número da Camisa'),
+                      decoration: const InputDecoration(labelText: 'Número da Camisa', border: OutlineInputBorder()),
                       keyboardType: TextInputType.number,
                       validator: (value) => (value?.isEmpty ?? true) ? 'Campo obrigatório' : null,
                     ),

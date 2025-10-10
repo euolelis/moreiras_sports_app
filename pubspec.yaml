@@ -6,9 +6,7 @@ version: 1.0.0+1
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
-# A linha 'dependencies:' NÃO deve ter nenhum espaço antes dela.
 dependencies:
-  # Cada dependência aqui deve ter EXATAMENTE 2 espaços antes.
   flutter:
     sdk: flutter
   
@@ -32,13 +30,19 @@ dependencies:
   cached_network_image: ^3.3.1 # Para exibir imagens da internet com cache
   lottie: ^3.3.2
 
-# Se você tiver dependências de desenvolvimento, elas viriam aqui, também alinhadas à esquerda
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
 
+# A seção 'flutter' começa aqui, sem espaços antes.
+flutter:
 
-assets:
+  # 'uses-material-design' e 'assets' estão DENTRO de 'flutter',
+  # por isso têm 2 espaços de indentação.
+  uses-material-design: true
+  assets:
+    # Os itens da lista de assets estão DENTRO de 'assets',
+    # por isso têm 4 espaços de indentação.
     - assets/images/
     - assets/animations/

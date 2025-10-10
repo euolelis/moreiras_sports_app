@@ -3,23 +3,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Imports das telas e serviços
+import '../core/models/game_model.dart';
 import '../core/services/auth_service.dart';
-import '../features/auth/screens/admin_login_screen.dart';
-import '../features/admin/screens/admin_dashboard_screen.dart';
-import '../features/admin/screens/manage_players_screen.dart';
+import '../features/admin/screens/add_edit_category_screen.dart'; // Novo import
+import '../features/admin/screens/add_edit_game_screen.dart';
+import '../features/admin/screens/add_edit_news_screen.dart';
 import '../features/admin/screens/add_edit_player_screen.dart';
-
-// Imports para o ShellRoute
-import '../shared/widgets/main_scaffold.dart';
+import '../features/admin/screens/admin_dashboard_screen.dart';
+import '../features/admin/screens/manage_categories_screen.dart'; // Novo import
+import '../features/admin/screens/manage_game_details_screen.dart';
+import '../features/admin/screens/manage_games_screen.dart';
+import '../features/admin/screens/manage_news_screen.dart';
+import '../features/admin/screens/manage_players_screen.dart';
+import '../features/auth/screens/admin_login_screen.dart';
+import '../features/auth/screens/landing_screen.dart';
 import '../features/home/screens/home_screen.dart';
-import '../features/players/screens/player_list_screen.dart';
 import '../features/players/screens/player_detail_screen.dart';
-// --- NOVO IMPORT PARA A SPLASH SCREEN ---
+import '../features/players/screens/player_list_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
+import '../shared/widgets/main_scaffold.dart';
 
-
-// Provider que expõe o estado de autenticação (sem alterações)
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authServiceProvider).authStateChanges;
 });
@@ -28,17 +31,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
-    initialLocation: '/splash', // <-- MUDANÇA AQUI
+    initialLocation: '/splash',
     refreshListenable: GoRouterRefreshStream(ref.watch(authStateProvider.stream)),
-
     routes: [
-      // --- ROTA DA SPLASH SCREEN ---
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
       ),
-
-      // --- ROTAS PÚBLICAS DENTRO DO SHELL ---
+      GoRoute(
+        path: '/landing',
+        builder: (context, state) => const LandingScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) {
           return MainScaffold(child: child);
@@ -63,8 +66,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-
-      // --- ROTAS FORA DO SHELL (TELA CHEIA) ---
       GoRoute(
         path: '/admin-login',
         builder: (context, state) => const AdminLoginScreen(),
@@ -73,6 +74,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/admin',
         builder: (context, state) => const AdminDashboardScreen(),
         routes: [
+          // Players
           GoRoute(
             path: 'manage-players',
             builder: (context, state) => const ManagePlayersScreen(),
@@ -88,11 +90,45 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               return AddEditPlayerScreen(playerId: playerId);
             },
           ),
+          // Games
+          GoRoute(
+            path: 'manage-games',
+            builder: (context, state) => const ManageGamesScreen(),
+            routes: [
+              GoRoute(
+                path: ':gameId',
+                builder: (context, state) {
+                  final game = state.extra as Game;
+                  return ManageGameDetailsScreen(game: game);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'add-game',
+            builder: (context, state) => const AddEditGameScreen(),
+          ),
+          // News
+          GoRoute(
+            path: 'manage-news',
+            builder: (context, state) => const ManageNewsScreen(),
+          ),
+          GoRoute(
+            path: 'add-news',
+            builder: (context, state) => const AddEditNewsScreen(),
+          ),
+          // Categories
+          GoRoute(
+            path: 'manage-categories',
+            builder: (context, state) => const ManageCategoriesScreen(),
+          ),
+          GoRoute(
+            path: 'add-category',
+            builder: (context, state) => const AddEditCategoryScreen(),
+          ),
         ],
       ),
     ],
-    
-    // A lógica de redirect continua exatamente a mesma
     redirect: (BuildContext context, GoRouterState state) {
       final isLoggedIn = authState.value != null;
       final isLoggingIn = state.matchedLocation == '/admin-login';
@@ -101,22 +137,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       if (!isLoggedIn && isAdminRoute) {
         return '/admin-login';
       }
-
       if (isLoggedIn && isLoggingIn) {
         return '/admin';
       }
-
       return null;
     },
-
-    // O errorBuilder continua o mesmo
     errorBuilder: (context, state) => Scaffold(
       body: Center(child: Text('Página não encontrada: ${state.error}')),
     ),
   );
 });
 
-// Classe auxiliar para o refreshListenable (sem alterações)
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();

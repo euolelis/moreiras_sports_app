@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/player_model.dart';
-import '../models/game_model.dart'; // 1. Adicione o import para o GameModel
+import '../models/game_model.dart';
+import '../models/game_event_model.dart';
+import '../models/news_model.dart';
+import '../models/category_model.dart'; // Novo import
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final String _schoolId = "moreiras-sport"; // Hardcoded para o projeto piloto
+  final String _schoolId = "moreiras-sport";
 
   // --- PLAYERS ---
 
-  // Pega um stream da lista de jogadores para exibir em tempo real
   Stream<List<Player>> getPlayersStream() {
     return _db
         .collection('schools')
@@ -22,7 +24,6 @@ class FirestoreService {
             .toList());
   }
 
-  // Salva (cria ou atualiza) um jogador
   Future<void> setPlayer(Player player) async {
     final docRef = _db
         .collection('schools')
@@ -30,6 +31,7 @@ class FirestoreService {
         .collection('players')
         .doc(player.id.isEmpty ? null : player.id);
 
+    // Nota: Este método precisará ser atualizado para incluir o categoryId
     final playerToSave = player.id.isEmpty
         ? Player(
             id: docRef.id,
@@ -37,13 +39,15 @@ class FirestoreService {
             position: player.position,
             number: player.number,
             birthDate: player.birthDate,
-            photoUrl: player.photoUrl)
+            photoUrl: player.photoUrl,
+            goals: player.goals,
+            assists: player.assists,
+            categoryId: player.categoryId)
         : player;
 
     await docRef.set(playerToSave.toFirestore());
   }
 
-  // Deleta um jogador
   Future<void> deletePlayer(String playerId) async {
     await _db
         .collection('schools')
@@ -53,7 +57,6 @@ class FirestoreService {
         .delete();
   }
 
-  // Pega um único jogador pelo seu ID
   Future<Player> getPlayerById(String playerId) async {
     try {
       final docSnapshot = await _db
@@ -73,13 +76,14 @@ class FirestoreService {
     }
   }
 
-  // --- GAMES --- (2. Nova seção e métodos adicionados)
+  // --- GAMES ---
+  
   Stream<List<Game>> getGamesStream() {
     return _db
         .collection('schools')
         .doc(_schoolId)
         .collection('games')
-        .orderBy('gameDate', descending: true) // Mais recentes primeiro
+        .orderBy('gameDate', descending: true)
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Game.fromFirestore(doc)).toList());
@@ -92,7 +96,6 @@ class FirestoreService {
         .collection('games')
         .doc(game.id.isEmpty ? null : game.id);
 
-    // Lógica para garantir que o ID está no documento
     final gameToSave = game.id.isEmpty
         ? Game(
             id: docRef.id,
@@ -100,14 +103,154 @@ class FirestoreService {
             opponent: game.opponent,
             gameDate: game.gameDate,
             location: game.location,
-            status: game.status)
+            status: game.status,
+            ourScore: game.ourScore,
+            opponentScore: game.opponentScore)
         : game;
 
     await docRef.set(gameToSave.toFirestore());
   }
+
+  Future<void> updateGameScore(String gameId, int ourScore, int opponentScore) async {
+    await _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('games')
+        .doc(gameId)
+        .update({
+      'ourScore': ourScore,
+      'opponentScore': opponentScore,
+      'status': 'Encerrado',
+    });
+  }
+
+  // --- GAME EVENTS ---
+
+  Future<void> addGameEvent(GameEvent event) async {
+    final batch = _db.batch();
+    final eventRef = _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('game_events')
+        .doc();
+    
+    final eventWithId = GameEvent(
+      id: eventRef.id, 
+      gameId: event.gameId, 
+      playerId: event.playerId, 
+      playerName: event.playerName, 
+      type: event.type, 
+      minute: event.minute
+    );
+
+    batch.set(eventRef, eventWithId.toFirestore());
+
+    if (event.type == GameEventType.gol || event.type == GameEventType.assistencia) {
+      final playerRef = _db
+          .collection('schools')
+          .doc(_schoolId)
+          .collection('players')
+          .doc(event.playerId);
+
+      final fieldToIncrement = event.type == GameEventType.gol ? 'goals' : 'assists';
+      
+      batch.update(playerRef, {fieldToIncrement: FieldValue.increment(1)});
+    }
+    await batch.commit();
+  }
+
+  Stream<List<GameEvent>> getEventsForGameStream(String gameId) {
+    return _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('game_events')
+        .where('gameId', isEqualTo: gameId)
+        .orderBy('minute')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => GameEvent.fromFirestore(doc))
+            .toList());
+  }
+
+  // --- NEWS ---
+  Stream<List<News>> getNewsStream() {
+    return _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('news')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => News.fromFirestore(doc)).toList());
+  }
+
+  Future<void> setNews(News newsItem) async {
+    final docRef = _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('news')
+        .doc(newsItem.id.isEmpty ? null : newsItem.id);
+
+    final newsToSave = newsItem.id.isEmpty
+        ? News(
+            id: docRef.id,
+            title: newsItem.title,
+            content: newsItem.content,
+            createdAt: newsItem.createdAt,
+            imageUrl: newsItem.imageUrl)
+        : newsItem;
+
+    await docRef.set(newsToSave.toFirestore());
+  }
+
+  Future<void> deleteNews(String newsId) async {
+    await _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('news')
+        .doc(newsId)
+        .delete();
+  }
+
+  // --- CATEGORIES ---
+  Stream<List<Category>> getCategoriesStream() {
+    return _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('categories')
+        .orderBy('name')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Category.fromFirestore(doc))
+            .toList());
+  }
+
+  Future<void> setCategory(Category category) async {
+    final docRef = _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('categories')
+        .doc(category.id.isEmpty ? null : category.id);
+
+    final categoryToSave = category.id.isEmpty
+        ? Category(id: docRef.id, name: category.name)
+        : category;
+
+    await docRef.set(categoryToSave.toFirestore());
+  }
+
+  Future<void> deleteCategory(String categoryId) async {
+    // CUIDADO: No futuro, precisaremos verificar se existem jogadores
+    // nesta categoria antes de permitir a exclusão.
+    await _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('categories')
+        .doc(categoryId)
+        .delete();
+  }
 }
 
-// Provider para disponibilizar o FirestoreService no app
 final firestoreServiceProvider = Provider<FirestoreService>((ref) {
   return FirestoreService();
 });
