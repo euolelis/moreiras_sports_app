@@ -5,22 +5,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/models/game_model.dart';
 import '../core/services/auth_service.dart';
-import '../features/admin/screens/add_edit_category_screen.dart'; // Novo import
+import '../features/admin/screens/add_edit_category_screen.dart';
 import '../features/admin/screens/add_edit_game_screen.dart';
 import '../features/admin/screens/add_edit_news_screen.dart';
 import '../features/admin/screens/add_edit_player_screen.dart';
+import '../features/admin/screens/add_edit_sponsor_screen.dart'; // Novo import
 import '../features/admin/screens/admin_dashboard_screen.dart';
-import '../features/admin/screens/manage_categories_screen.dart'; // Novo import
+import '../features/admin/screens/manage_categories_screen.dart';
 import '../features/admin/screens/manage_game_details_screen.dart';
 import '../features/admin/screens/manage_games_screen.dart';
 import '../features/admin/screens/manage_news_screen.dart';
 import '../features/admin/screens/manage_players_screen.dart';
+import '../features/admin/screens/manage_sponsors_screen.dart'; // Novo import
 import '../features/auth/screens/admin_login_screen.dart';
 import '../features/auth/screens/landing_screen.dart';
+import '../features/games/screens/games_list_screen.dart';
 import '../features/home/screens/home_screen.dart';
+import '../features/news/screens/news_list_screen.dart';
 import '../features/players/screens/player_detail_screen.dart';
 import '../features/players/screens/player_list_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
+import '../features/sponsors/screens/sponsors_screen.dart'; // Novo import
+import '../features/stats/screens/stats_screen.dart';
 import '../shared/widgets/main_scaffold.dart';
 
 final authStateProvider = StreamProvider<User?>((ref) {
@@ -64,6 +70,23 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+          GoRoute(
+            path: '/games',
+            builder: (context, state) => const GamesListScreen(),
+          ),
+          GoRoute(
+            path: '/news',
+            builder: (context, state) => const NewsListScreen(),
+          ),
+          GoRoute(
+            path: '/stats',
+            builder: (context, state) => const StatsScreen(),
+          ),
+          // Nova rota pública de patrocinadores
+          GoRoute(
+            path: '/sponsors',
+            builder: (context, state) => const SponsorsScreen(),
+          ),
         ],
       ),
       GoRoute(
@@ -72,7 +95,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/admin',
-        builder: (context, state) => const AdminDashboardScreen(),
+        builder: (context, state) {
+          String? message;
+          if (state.extra is String) {
+            message = state.extra as String?;
+          }
+          return AdminDashboardScreen(message: message);
+        },
         routes: [
           // Players
           GoRoute(
@@ -108,6 +137,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: 'add-game',
             builder: (context, state) => const AddEditGameScreen(),
           ),
+          GoRoute(
+            path: 'edit-game/:gameId',
+            builder: (context, state) {
+              final gameId = state.pathParameters['gameId']!;
+              return AddEditGameScreen(gameId: gameId);
+            },
+          ),
           // News
           GoRoute(
             path: 'manage-news',
@@ -125,6 +161,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'add-category',
             builder: (context, state) => const AddEditCategoryScreen(),
+          ),
+          // Novas rotas de admin para patrocinadores
+          GoRoute(
+            path: 'manage-sponsors',
+            builder: (context, state) => const ManageSponsorsScreen(),
+          ),
+          GoRoute(
+            path: 'add-sponsor',
+            builder: (context, state) => const AddEditSponsorScreen(),
           ),
         ],
       ),

@@ -10,20 +10,18 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("MOREIRA'S SPORT"),
         centerTitle: true,
-        // --- SEÇÃO ADICIONADA ---
         actions: [
           IconButton(
             icon: const Icon(Icons.admin_panel_settings_outlined),
-            tooltip: 'Acesso Administrativo', // Texto que aparece ao passar o mouse por cima
+            tooltip: 'Acesso Administrativo',
             onPressed: () {
               context.go('/admin-login');
             },
           ),
         ],
-        // --- FIM DA SEÇÃO ---
       ),
       body: GridView.count(
-        crossAxisCount: 2, // 2 colunas
+        crossAxisCount: 2,
         padding: const EdgeInsets.all(16.0),
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
@@ -33,11 +31,31 @@ class HomeScreen extends StatelessWidget {
             label: 'ELENCO',
             onTap: () => context.go('/players'),
           ),
-          _MenuButton(icon: Icons.event, label: 'JOGOS', onTap: () {}),
-          _MenuButton(icon: Icons.bar_chart, label: 'ESTATÍSTICAS', onTap: () {}),
-          _MenuButton(icon: Icons.business, label: 'PATROCINADORES', onTap: () {}),
-          _MenuButton(icon: Icons.photo_library, label: 'GALERIA', onTap: () {}),
-          _MenuButton(icon: Icons.video_library, label: 'VÍDEOS', onTap: () {}),
+          _MenuButton(
+            icon: Icons.event,
+            label: 'JOGOS',
+            onTap: () => context.go('/games'),
+          ),
+          _MenuButton(
+            icon: Icons.bar_chart,
+            label: 'ESTATÍSTICAS',
+            onTap: () => context.go('/stats'),
+          ),
+          _MenuButton(
+            icon: Icons.newspaper,
+            label: 'NOTÍCIAS',
+            onTap: () => context.go('/news'),
+          ),
+          _MenuButton(
+            icon: Icons.photo_library,
+            label: 'GALERIA',
+            onTap: () {},
+          ),
+          _MenuButton(
+            icon: Icons.business,
+            label: 'PATROCINADORES',
+            onTap: () => context.go('/sponsors'), // ATIVE AQUI
+          ),
         ],
       ),
     );

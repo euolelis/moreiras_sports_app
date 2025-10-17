@@ -4,7 +4,8 @@ import '../models/player_model.dart';
 import '../models/game_model.dart';
 import '../models/game_event_model.dart';
 import '../models/news_model.dart';
-import '../models/category_model.dart'; // Novo import
+import '../models/category_model.dart';
+import '../models/sponsor_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -31,7 +32,6 @@ class FirestoreService {
         .collection('players')
         .doc(player.id.isEmpty ? null : player.id);
 
-    // Nota: Este método precisará ser atualizado para incluir o categoryId
     final playerToSave = player.id.isEmpty
         ? Player(
             id: docRef.id,
@@ -42,7 +42,12 @@ class FirestoreService {
             photoUrl: player.photoUrl,
             goals: player.goals,
             assists: player.assists,
-            categoryId: player.categoryId)
+            categoryId: player.categoryId,
+            gamesPlayed: player.gamesPlayed,
+            manOfTheMatch: player.manOfTheMatch,
+            socialUrl: player.socialUrl,
+            yellowCards: player.yellowCards,
+            redCards: player.redCards)
         : player;
 
     await docRef.set(playerToSave.toFirestore());
@@ -105,7 +110,8 @@ class FirestoreService {
             location: game.location,
             status: game.status,
             ourScore: game.ourScore,
-            opponentScore: game.opponentScore)
+            opponentScore: game.opponentScore,
+            categoryId: game.categoryId)
         : game;
 
     await docRef.set(gameToSave.toFirestore());
@@ -122,6 +128,20 @@ class FirestoreService {
       'opponentScore': opponentScore,
       'status': 'Encerrado',
     });
+  }
+
+  Future<Game> getGameById(String gameId) async {
+    final docSnapshot = await _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('games')
+        .doc(gameId)
+        .get();
+    if (docSnapshot.exists) {
+      return Game.fromFirestore(docSnapshot);
+    } else {
+      throw Exception('Jogo não encontrado');
+    }
   }
 
   // --- GAME EVENTS ---
@@ -145,17 +165,39 @@ class FirestoreService {
 
     batch.set(eventRef, eventWithId.toFirestore());
 
-    if (event.type == GameEventType.gol || event.type == GameEventType.assistencia) {
+    if (event.type == GameEventType.gol ||
+        event.type == GameEventType.assistencia ||
+        event.type == GameEventType.cartaoAmarelo ||
+        event.type == GameEventType.cartaoVermelho) {
+          
       final playerRef = _db
           .collection('schools')
           .doc(_schoolId)
           .collection('players')
           .doc(event.playerId);
 
-      final fieldToIncrement = event.type == GameEventType.gol ? 'goals' : 'assists';
+      String fieldToIncrement;
+      switch (event.type) {
+        case GameEventType.gol:
+          fieldToIncrement = 'goals';
+          break;
+        case GameEventType.assistencia:
+          fieldToIncrement = 'assists';
+          break;
+        case GameEventType.cartaoAmarelo:
+          fieldToIncrement = 'yellowCards';
+          break;
+        case GameEventType.cartaoVermelho:
+          fieldToIncrement = 'redCards';
+          break;
+        default:
+          await batch.commit();
+          return;
+      }
       
       batch.update(playerRef, {fieldToIncrement: FieldValue.increment(1)});
     }
+
     await batch.commit();
   }
 
@@ -240,13 +282,49 @@ class FirestoreService {
   }
 
   Future<void> deleteCategory(String categoryId) async {
-    // CUIDADO: No futuro, precisaremos verificar se existem jogadores
-    // nesta categoria antes de permitir a exclusão.
     await _db
         .collection('schools')
         .doc(_schoolId)
         .collection('categories')
         .doc(categoryId)
+        .delete();
+  }
+
+  // --- SPONSORS ---
+  Stream<List<Sponsor>> getSponsorsStream() {
+    return _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('sponsors')
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Sponsor.fromFirestore(doc)).toList());
+  }
+
+  Future<void> setSponsor(Sponsor sponsor) async {
+    final docRef = _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('sponsors')
+        .doc(sponsor.id.isEmpty ? null : sponsor.id);
+
+    final sponsorToSave = sponsor.id.isEmpty
+        ? Sponsor(
+            id: docRef.id,
+            name: sponsor.name,
+            logoUrl: sponsor.logoUrl,
+            website: sponsor.website)
+        : sponsor;
+
+    await docRef.set(sponsorToSave.toFirestore());
+  }
+
+  Future<void> deleteSponsor(String sponsorId) async {
+    await _db
+        .collection('schools')
+        .doc(_schoolId)
+        .collection('sponsors')
+        .doc(sponsorId)
         .delete();
   }
 }

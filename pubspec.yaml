@@ -1,48 +1,80 @@
+# ===================================================================
+#  MOREIRA'S SPORTS APP - PROJETO PILOTO
+# ===================================================================
+#  Plataforma de gestão para escolas de futebol.
+#  Desenvolvido com Flutter e Firebase.
+# -------------------------------------------------------------------
 name: moreiras_sports_app
-description: A new Flutter project.
+description: Aplicativo de gestão para a escola de futebol Moreira's Sports, servindo como projeto piloto para uma plataforma SaaS white-label.
+
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.1+2
 
+# ===================================================================
+#  AMBIENTE DE DESENVOLVIMENTO
+# ===================================================================
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.1.0 <4.0.0'
 
+# ===================================================================
+#  DEPENDÊNCIAS PRINCIPAIS
+# ===================================================================
 dependencies:
   flutter:
     sdk: flutter
-  
-  cupertino_icons: ^1.0.2
+  flutter_localizations:
+    sdk: flutter
 
-  # Firebase
+  # --- FIREBASE (Backend Services) ---
   firebase_core: ^2.27.0
   cloud_firestore: ^4.15.8
   firebase_auth: ^4.17.8
   firebase_storage: ^11.6.9
 
-  # State Management
+  # --- GERENCIAMENTO DE ESTADO ---
   flutter_riverpod: ^2.5.1
 
-  # Routing
+  # --- NAVEGAÇÃO ---
   go_router: ^13.2.4
 
-  # Utilities
-  intl: ^0.19.0 # Para datas
-  image_picker: ^1.0.7 # Para upload de imagens pelo admin
-  cached_network_image: ^3.3.1 # Para exibir imagens da internet com cache
-  lottie: ^3.3.2
+  # --- UI & UTILITÁRIOS ---
+  cached_network_image: ^3.3.1
+  image_picker: ^1.0.7
+  intl: ^0.20.2
+  lottie: ^3.1.0
+  cupertino_icons: ^1.0.6
+  url_launcher: ^6.3.2
 
+# ===================================================================
+#  DEPENDÊNCIAS DE DESENVOLVIMENTO
+# ===================================================================
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.13.1
 
-# A seção 'flutter' começa aqui, sem espaços antes.
+# ===================================================================
+#  CONFIGURAÇÃO ESPECÍFICA DO FLUTTER
+# ===================================================================
 flutter:
-
-  # 'uses-material-design' e 'assets' estão DENTRO de 'flutter',
-  # por isso têm 2 espaços de indentação.
   uses-material-design: true
   assets:
-    # Os itens da lista de assets estão DENTRO de 'assets',
-    # por isso têm 4 espaços de indentação.
     - assets/images/
     - assets/animations/
+
+# ===================================================================
+#  CONFIGURAÇÃO DE PACOTES 
+# ===================================================================
+flutter_launcher_icons:
+  # As chaves dentro dele devem ter 2 espaços
+  # --- Configuração para Android ---
+  android: true # Habilita a geração para Android
+  image_path: "assets/images/logo.png" # Caminho para sua imagem principal
+  min_sdk_android: 21 # Necessário para ícones adaptativos
+  # adaptive_icon_background: "#8B0000" # Cor de fundo para o ícone adaptativo (vermelho escuro)
+  # adaptive_icon_foreground: "assets/images/logo_foreground.png" # Se você tiver uma versão do logo só com o símbolo
+
+  # --- Configuração para iOS ---
+  ios: true # Habilita a geração para iOS
+  remove_alpha_ios: true # Remove a transparência do fundo para ícones do iOS

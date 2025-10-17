@@ -9,7 +9,13 @@ class Player {
   final String? photoUrl;
   final int goals;
   final int assists;
-  final String categoryId; // Novo campo obrigatório
+  final String categoryId;
+  final int gamesPlayed;
+  final int manOfTheMatch;
+  final String? socialUrl;
+  // Novos campos para cartões
+  final int yellowCards;
+  final int redCards;
 
   Player({
     required this.id,
@@ -18,15 +24,19 @@ class Player {
     required this.number,
     required this.birthDate,
     this.photoUrl,
-    this.goals = 0, // Valor padrão para novos jogadores
-    this.assists = 0, // Valor padrão para novos jogadores
+    this.goals = 0,
+    this.assists = 0,
     required this.categoryId,
+    this.gamesPlayed = 0,
+    this.manOfTheMatch = 0,
+    this.socialUrl,
+    // Adicionados ao construtor com valor padrão
+    this.yellowCards = 0,
+    this.redCards = 0,
   });
 
-  // Converte um Documento do Firestore para um objeto Player
   factory Player.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     final data = snapshot.data();
-    // Verificação de segurança para caso os dados sejam nulos
     if (data == null) {
       throw StateError('Missing data for playerId: ${snapshot.id}');
     }
@@ -36,27 +46,36 @@ class Player {
       name: data['name'] ?? '',
       position: data['position'] ?? '',
       number: data['number'] ?? 0,
-      // CORREÇÃO: Lida com o tipo Timestamp do Firestore
       birthDate: (data['birthDate'] as Timestamp).toDate(),
       photoUrl: data['photoUrl'],
       goals: data['goals'] ?? 0,
       assists: data['assists'] ?? 0,
       categoryId: data['categoryId'] ?? '',
+      gamesPlayed: data['gamesPlayed'] ?? 0,
+      manOfTheMatch: data['manOfTheMatch'] ?? 0,
+      socialUrl: data['socialUrl'],
+      // Lendo os novos campos do Firestore, com fallback para 0
+      yellowCards: data['yellowCards'] ?? 0,
+      redCards: data['redCards'] ?? 0,
     );
   }
 
-  // Converte um objeto Player para um Map para salvar no Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
       'position': position,
       'number': number,
-      // CORREÇÃO: Converte DateTime para Timestamp do Firestore
       'birthDate': Timestamp.fromDate(birthDate),
       'photoUrl': photoUrl,
       'goals': goals,
       'assists': assists,
       'categoryId': categoryId,
+      'gamesPlayed': gamesPlayed,
+      'manOfTheMatch': manOfTheMatch,
+      'socialUrl': socialUrl,
+      // Adicionando os novos campos para salvar no Firestore
+      'yellowCards': yellowCards,
+      'redCards': redCards,
     };
   }
 }

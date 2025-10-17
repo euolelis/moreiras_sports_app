@@ -37,12 +37,25 @@ class ManageGamesScreen extends ConsumerWidget {
               return ListTile(
                 title: Text('${game.opponent} (${game.championship})'),
                 subtitle: Text(DateFormat('dd/MM/yyyy HH:mm').format(game.gameDate)),
-                trailing: Text(game.status),
                 onTap: () {
-                  // Navega para a tela de detalhes, passando o ID na URL
-                  // e o objeto 'game' completo como 'extra' para evitar re-fetch.
+                  // Navegar para a tela de detalhes do jogo (onde se lançam os eventos)
                   context.go('/admin/manage-games/${game.id}', extra: game);
                 },
+                // Adiciona um botão de edição
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(game.status),
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      tooltip: 'Editar Jogo',
+                      onPressed: () {
+                        // Navegar para a tela de edição do formulário
+                        context.go('/admin/edit-game/${game.id}');
+                      },
+                    ),
+                  ],
+                ),
               );
             },
           );

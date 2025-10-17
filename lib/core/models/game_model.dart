@@ -7,9 +7,9 @@ class Game {
   final DateTime gameDate;
   final String location;
   final String status;
-  // Novos campos para o placar
   final int? ourScore;
   final int? opponentScore;
+  final String categoryId; // <-- NOVO CAMPO
 
   Game({
     required this.id,
@@ -18,9 +18,9 @@ class Game {
     required this.gameDate,
     required this.location,
     required this.status,
-    // Adicionados ao construtor
     this.ourScore,
     this.opponentScore,
+    required this.categoryId, // <-- NOVO PARÂMETRO OBRIGATÓRIO
   });
 
   factory Game.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
@@ -32,9 +32,9 @@ class Game {
       gameDate: (data['gameDate'] as Timestamp).toDate(),
       location: data['location'],
       status: data['status'],
-      // Lendo os novos campos do Firestore
       ourScore: data['ourScore'],
       opponentScore: data['opponentScore'],
+      categoryId: data['categoryId'] ?? '', // <-- LER DO FIRESTORE
     );
   }
 
@@ -45,9 +45,9 @@ class Game {
       'gameDate': Timestamp.fromDate(gameDate),
       'location': location,
       'status': status,
-      // Adicionando os novos campos para salvar no Firestore
       'ourScore': ourScore,
       'opponentScore': opponentScore,
+      'categoryId': categoryId, // <-- SALVAR NO FIRESTORE
     };
   }
 }

@@ -16,12 +16,10 @@
   // Esquema de cores moderno (Material 3)
   colorScheme: const ColorScheme.dark(
     primary: primaryColor,
-    secondary: brandingRed, // <-- MUDANÇA: Usando o vermelho como cor secundária
-    background: darkBackground,
+    secondary: brandingRed,
     surface: cardColor,
     onPrimary: textOnGold, // <-- MUDANÇA: Texto sobre a cor primária (botões) será preto
     onSecondary: Colors.white,
-    onBackground: Colors.white,
     onSurface: Colors.white,
   ),
 

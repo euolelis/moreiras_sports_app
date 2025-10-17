@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/services/auth_service.dart'; // 1. Importe o serviço de autenticação
 
 class AdminLoginScreen extends ConsumerStatefulWidget {
@@ -49,7 +48,9 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
       // mostra uma mensagem de erro na parte inferior da tela.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
+          const SnackBar(content: Text('E-mail ou senha inválidos. Tente novamente.'),
+        backgroundColor: Colors.red, // Adiciona um feedback visual de erro
+      ),
         );
       }
     } finally {

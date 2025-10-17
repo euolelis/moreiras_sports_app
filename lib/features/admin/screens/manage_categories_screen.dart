@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/models/category_model.dart';
 import '../../../core/services/firestore_service.dart';
+import '../../../shared/widgets/confirm_dialog.dart'; // 1. Importe o novo dialog
 
 final categoriesStreamProvider = StreamProvider.autoDispose<List<Category>>((ref) {
   return ref.watch(firestoreServiceProvider).getCategoriesStream();
@@ -33,9 +34,16 @@ class ManageCategoriesScreen extends ConsumerWidget {
               title: Text(category.name),
               trailing: IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red),
+                // 2. Modifique o onPressed para usar o dialog
                 onPressed: () async {
-                  // Adicionar um dialog de confirmação aqui é uma boa prática
-                  await ref.read(firestoreServiceProvider).deleteCategory(category.id);
+                  final confirm = await showConfirmDialog(
+                    context: context,
+                    title: 'Confirmar Exclusão',
+                    content: 'Tem certeza que deseja deletar a categoria "${category.name}"? Esta ação não pode ser desfeita.',
+                  );
+                  if (confirm) {
+                    await ref.read(firestoreServiceProvider).deleteCategory(category.id);
+                  }
                 },
               ),
               // onTap: () => context.go('/admin/edit-category/${category.id}'),

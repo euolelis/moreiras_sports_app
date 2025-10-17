@@ -3,11 +3,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/services/auth_service.dart';
 
-class AdminDashboardScreen extends ConsumerWidget {
-  const AdminDashboardScreen({super.key});
+// 1. Convertido para ConsumerStatefulWidget
+class AdminDashboardScreen extends ConsumerStatefulWidget {
+  final String? message; // Recebe a mensagem opcional da navegação
+  const AdminDashboardScreen({super.key, this.message});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
+}
+
+class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
+  
+  // 2. Adicionado initState para mostrar o SnackBar
+  @override
+  void initState() {
+    super.initState();
+    // Se uma mensagem foi passada através do parâmetro 'extra' do GoRouter...
+    if (widget.message != null) {
+      // Atrasamos a execução para garantir que o Scaffold da tela já esteja construído
+      Future.microtask(() {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(widget.message!)),
+        );
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // O conteúdo do build permanece o mesmo, mas agora está dentro da classe State.
+    // O 'ref' está disponível como uma propriedade da classe ConsumerState.
     return Scaffold(
       appBar: AppBar(
         title: const Text("Painel do Admin"),
@@ -17,7 +42,7 @@ class AdminDashboardScreen extends ConsumerWidget {
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await ref.read(authServiceProvider).signOut();
-              context.go('/landing'); // Volta para a tela de entrada
+              context.go('/landing');
             },
           )
         ],
@@ -38,13 +63,11 @@ class AdminDashboardScreen extends ConsumerWidget {
             label: 'Jogos',
             onTap: () => context.go('/admin/manage-games'),
           ),
-          // --- NOVO BOTÃO ADICIONADO ---
           _AdminMenuButton(
             icon: Icons.category,
             label: 'Categorias',
             onTap: () => context.go('/admin/manage-categories'),
           ),
-          // --- FIM DO NOVO BOTÃO ---
           _AdminMenuButton(
             icon: Icons.newspaper,
             label: 'Notícias',
@@ -53,16 +76,12 @@ class AdminDashboardScreen extends ConsumerWidget {
           _AdminMenuButton(
             icon: Icons.business_center,
             label: 'Patrocinadores',
-            onTap: () {
-              // Navegar para gerenciar patrocinadores
-            },
+            onTap: () => context.go('/admin/manage-sponsors'), // ATIVE AQUI
           ),
           _AdminMenuButton(
             icon: Icons.photo_album,
             label: 'Galeria',
-            onTap: () {
-              // Navegar para gerenciar galeria
-            },
+            onTap: () {},
           ),
         ],
       ),
@@ -70,7 +89,7 @@ class AdminDashboardScreen extends ConsumerWidget {
   }
 }
 
-// Widget auxiliar para os botões do menu do admin
+// O widget auxiliar _AdminMenuButton não precisa de alterações.
 class _AdminMenuButton extends StatelessWidget {
   final IconData icon;
   final String label;
