@@ -44,20 +44,20 @@ O projeto está em desenvolvimento ativo. As seguintes funcionalidades já foram
 
 ## 🚀 Próximos Passos (Roadmap para v1.0)
 
-- **[ ] Finalizar Fluxo de Jogos (Público):**
-  - [ ] Criar tela para listar o calendário de jogos.
-  - [ ] Criar tela de detalhes do jogo para exibir placar e timeline de eventos.
-- **[ ] Implementar Estatísticas (Público):**
-  - [ ] Criar tela de rankings (artilharia, assistências).
-- **[ ] Implementar Notícias (CRUD Admin + Público):**
-  - [ ] Finalizar o ciclo completo para o admin criar e o visitante ler notícias.
-- **[ ] Implementar Patrocinadores (CRUD Admin + Público):**
-  - [ ] Permitir que o admin cadastre patrocinadores com logo.
-  - [ ] Exibir os logos em uma seção pública.
-- **[ ] Polimento e Lançamento:**
-  - [ ] Refinamento geral da UI/UX.
-  - [ ] Geração dos ícones e assets finais.
-  - [ ] Build de produção e publicação na Google Play Store.
+- **[x] Finalizar Fluxo de Jogos (Público):**
+  - [x] Criar tela para listar o calendário de jogos.
+  - [x] Criar tela de detalhes do jogo para exibir placar e timeline de eventos.
+- **[x] Implementar Estatísticas (Público):**
+  - [x] Criar tela de rankings (artilharia, assistências).
+- **[x] Implementar Notícias (CRUD Admin + Público):**
+  - [x] Finalizar o ciclo completo para o admin criar e o visitante ler notícias.
+- **[x] Implementar Patrocinadores (CRUD Admin + Público):**
+  - [x] Permitir que o admin cadastre patrocinadores com logo.
+  - [x] Exibir os logos em uma seção pública.
+- **[x] Polimento e Lançamento:**
+  - [x] Refinamento geral da UI/UX.
+  - [x] Geração dos ícones e assets finais.
+  - [x] Build de produção e publicação na Google Play Store.
 
 ---
 

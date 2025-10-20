@@ -4,13 +4,12 @@ import 'package:go_router/go_router.dart';
 import '../../../core/models/player_model.dart';
 import '../../../core/services/firestore_service.dart';
 import '../../../shared/widgets/confirm_dialog.dart';
+import 'manage_categories_screen.dart'; // Import para o provider de categorias
 
-// O provider continua o mesmo
 final playersStreamProvider = StreamProvider.autoDispose<List<Player>>((ref) {
   return ref.watch(firestoreServiceProvider).getPlayersStream();
 });
 
-// 1. Convertido para ConsumerStatefulWidget
 class ManagePlayersScreen extends ConsumerStatefulWidget {
   const ManagePlayersScreen({super.key});
 
@@ -20,11 +19,12 @@ class ManagePlayersScreen extends ConsumerStatefulWidget {
 
 class _ManagePlayersScreenState extends ConsumerState<ManagePlayersScreen> {
   final _searchController = TextEditingController();
+  String? _selectedCategoryId; // 2. Variável de estado para o filtro de categoria
 
   @override
   void initState() {
     super.initState();
-    // Adiciona um listener para reconstruir a UI quando o texto da busca mudar
+    // O listener garante que a UI reconstrua a cada letra digitada na busca
     _searchController.addListener(() {
       setState(() {});
     });
@@ -52,10 +52,30 @@ class _ManagePlayersScreenState extends ConsumerState<ManagePlayersScreen> {
           ),
         ],
       ),
-      // 2. Corpo envolvido em uma Column para a barra de busca
       body: Column(
         children: [
-          // --- BARRA DE BUSCA ---
+          // 3. --- FILTRO DE CATEGORIA ---
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0), // Ajuste de padding
+            child: Consumer(builder: (context, ref, child) {
+              final categoriesAsync = ref.watch(categoriesStreamProvider);
+              return categoriesAsync.when(
+                data: (categories) => DropdownButtonFormField<String?>(
+                  value: _selectedCategoryId,
+                  hint: const Text('Filtrar por Categoria'),
+                  decoration: const InputDecoration(border: OutlineInputBorder()),
+                  items: [
+                    const DropdownMenuItem(value: null, child: Text('Todas as Categorias')),
+                    ...categories.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))),
+                  ],
+                  onChanged: (value) => setState(() => _selectedCategoryId = value),
+                ),
+                loading: () => const SizedBox.shrink(),
+                error: (e, s) => const SizedBox.shrink(),
+              );
+            }),
+          ),
+          // --- BARRA DE BUSCA (JÁ EXISTENTE) ---
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -75,16 +95,16 @@ class _ManagePlayersScreenState extends ConsumerState<ManagePlayersScreen> {
               ),
             ),
           ),
-          // --- FIM DA BARRA DE BUSCA ---
-
           // --- LISTA DE JOGADORES ---
           Expanded(
             child: playersAsyncValue.when(
               data: (players) {
-                // Lógica de filtragem
+                // Lógica de filtragem combinada
                 final searchQuery = _searchController.text.toLowerCase();
                 final filteredPlayers = players.where((player) {
-                  return player.name.toLowerCase().contains(searchQuery);
+                  final categoryMatch = _selectedCategoryId == null || player.categoryId == _selectedCategoryId;
+                  final nameMatch = player.name.toLowerCase().contains(searchQuery);
+                  return categoryMatch && nameMatch;
                 }).toList();
 
                 if (filteredPlayers.isEmpty) {
@@ -120,7 +140,7 @@ class _ManagePlayersScreenState extends ConsumerState<ManagePlayersScreen> {
                                 title: 'Confirmar Exclusão',
                                 content: 'Tem certeza que deseja deletar o jogador "${player.name}"?',
                               );
-                              if (confirm) {
+                              if (confirm && context.mounted) {
                                 await ref.read(firestoreServiceProvider).deletePlayer(player.id);
                               }
                             },

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart'; // Importe o GoRouter
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart'; // 1. Importe o pacote
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/models/player_model.dart';
 import '../../../core/services/firestore_service.dart';
 
@@ -24,7 +25,6 @@ class PlayerDetailScreen extends ConsumerWidget {
     return age;
   }
 
-  // 2. Função para tentar abrir a URL
   Future<void> _launchSocialUrl(String? url, BuildContext context) async {
     if (url != null && url.isNotEmpty) {
       final uri = Uri.parse(url);
@@ -51,12 +51,13 @@ class PlayerDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: playerAsyncValue.when(
         data: (player) {
           final age = _calculateAge(player.birthDate);
           return Container(
-                color: Theme.of(context).scaffoldBackgroundColor, // <-- USA A COR DE FUNDO DO TEMA
+            color: Theme.of(context).scaffoldBackgroundColor,
             child: Column(
               children: [
                 Expanded(
@@ -136,8 +137,12 @@ class PlayerDetailScreen extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _ActionButton(icon: Icons.photo_library, label: 'FOTOS/VÍDEOS', onTap: () {}),
-                            _ActionButton(icon: Icons.bar_chart, label: 'ESTATÍSTICAS', onTap: () {}),
-                            // 3. Conecte a função ao onTap
+                            // --- onTap ATIVADO AQUI ---
+                            _ActionButton(
+                              icon: Icons.bar_chart,
+                              label: 'ESTATÍSTICAS',
+                              onTap: () => context.go('/players/${player.id}/stats', extra: player),
+                            ),
                             _ActionButton(
                               icon: Icons.public,
                               label: 'REDES SOCIAIS',

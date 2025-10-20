@@ -6,21 +6,31 @@ import 'package:image_picker/image_picker.dart';
 class StorageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  // Faz o upload de uma imagem de jogador e retorna a URL de download
+  // --- MÉTODO CORRIGIDO E MULTIPLATAFORMA ---
   Future<String> uploadPlayerImage(XFile imageFile) async {
     try {
-      final fileName = 'player_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final ref = _storage.ref().child('player_photos/$fileName');
+      // Cria uma referência única para o arquivo
+      final fileName = 'player_photos/player_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final ref = _storage.ref().child(fileName);
+
+      // Lê o arquivo como um array de bytes (Uint8List).
       final Uint8List fileBytes = await imageFile.readAsBytes();
-      await ref.putData(fileBytes);
-      return await ref.getDownloadURL();
+
+      // Faz o upload dos bytes para o Firebase Storage, especificando o tipo de conteúdo.
+      final metadata = SettableMetadata(contentType: 'image/jpeg');
+      
+      await ref.putData(fileBytes, metadata);
+
+      // Retorna a URL de download para salvar no Firestore
+      final downloadUrl = await ref.getDownloadURL();
+      return downloadUrl;
     } on FirebaseException catch (e) {
       throw Exception('Erro no upload da imagem: ${e.message}');
     }
   }
+  // --- FIM DO MÉTODO CORRIGIDO ---
 
-  // --- NOVO MÉTODO ADICIONADO ---
-  // Faz o upload de um logo de patrocinador e retorna a URL de download
+  // O método para upload de logo de patrocinador permanece o mesmo
   Future<String> uploadSponsorLogo(XFile imageFile) async {
     try {
       final fileName = 'sponsor_${DateTime.now().millisecondsSinceEpoch}.jpg';
@@ -34,7 +44,7 @@ class StorageService {
   }
 }
 
-// Provider para o serviço
+// Provider (sem alterações)
 final storageServiceProvider = Provider<StorageService>((ref) {
   return StorageService();
 });

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart'; // 1. Importe o GoRouter
 import 'package:intl/intl.dart';
 import '../../../core/models/game_model.dart';
 import '../../../core/services/firestore_service.dart';
+import '../../../core/providers/global_filter_provider.dart';
 
-// Provider para buscar o stream de jogos
 final gamesStreamProvider = StreamProvider.autoDispose<List<Game>>((ref) {
   return ref.watch(firestoreServiceProvider).getGamesStream();
 });
@@ -15,39 +16,47 @@ class GamesListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gamesAsyncValue = ref.watch(gamesStreamProvider);
+    final selectedCategory = ref.watch(selectedCategoryProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("CALENDÁRIO DE JOGOS"),
-        centerTitle: true,
-      ),
       body: gamesAsyncValue.when(
         data: (games) {
-          if (games.isEmpty) {
-            return const Center(child: Text("Nenhum jogo agendado."));
+          final filteredGames = selectedCategory == null
+              ? games
+              : games.where((g) => g.categoryId == selectedCategory.id).toList();
+
+          if (filteredGames.isEmpty) {
+            return const Center(child: Text("Nenhum jogo agendado para esta categoria."));
           }
           return ListView.builder(
             padding: const EdgeInsets.all(8.0),
-            itemCount: games.length,
+            itemCount: filteredGames.length,
             itemBuilder: (context, index) {
-              final game = games[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16.0),
-                  title: Text(
-                    "Moreira's Sports x ${game.opponent}",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+              final game = filteredGames[index];
+              // 2. Adicione o InkWell para tornar o Card clicável
+              return InkWell(
+                onTap: () {
+                  // Navega para a nova tela de detalhes, passando o objeto 'game'
+                  context.go('/games/${game.id}', extra: game);
+                },
+                child: Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(16.0),
+                    title: Text(
+                      "Moreira's Sports x ${game.opponent}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(game.championship),
+                        const SizedBox(height: 4),
+                        Text(DateFormat('dd/MM/yyyy \'às\' HH:mm').format(game.gameDate)),
+                      ],
+                    ),
+                    trailing: _buildScore(context, game),
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(game.championship),
-                      const SizedBox(height: 4),
-                      Text(DateFormat('dd/MM/yyyy \'às\' HH:mm').format(game.gameDate)),
-                    ],
-                  ),
-                  trailing: _buildScore(context, game),
                 ),
               );
             },
@@ -59,7 +68,6 @@ class GamesListScreen extends ConsumerWidget {
     );
   }
 
-  // Widget auxiliar para mostrar o placar ou o status
   Widget _buildScore(BuildContext context, Game game) {
     if (game.status == 'Encerrado' && game.ourScore != null) {
       return Text(

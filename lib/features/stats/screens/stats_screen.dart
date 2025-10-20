@@ -1,96 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/player_model.dart';
-import '../../admin/screens/manage_categories_screen.dart'; // Provider de categorias
-import '../../players/screens/player_list_screen.dart'; // Provider de jogadores
+import '../../players/screens/player_list_screen.dart'; // Reutiliza o provider de jogadores
+import '../../../core/providers/global_filter_provider.dart'; // Importa o filtro global
 
-class StatsScreen extends ConsumerStatefulWidget {
+class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
 
   @override
-  ConsumerState<StatsScreen> createState() => _StatsScreenState();
-}
-
-class _StatsScreenState extends ConsumerState<StatsScreen> {
-  String? _selectedCategoryId;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final playersAsyncValue = ref.watch(allPlayersStreamProvider);
-    final categoriesAsyncValue = ref.watch(categoriesStreamProvider);
+    final selectedCategory = ref.watch(selectedCategoryProvider); // Ouve o filtro global
 
     return DefaultTabController(
       length: 3, // Número de abas: Artilharia, Assistências, Cartões
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text("ESTATÍSTICAS"),
-          centerTitle: true,
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'ARTILHARIA'),
-              Tab(text: 'ASSISTÊNCIAS'),
-              Tab(text: 'CARTÕES'),
-            ],
-          ),
-        ),
-        body: Column(
-          children: [
-            // --- FILTRO DE CATEGORIA ---
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: categoriesAsyncValue.when(
-                data: (categories) => DropdownButtonFormField<String>(
-                  initialValue: _selectedCategoryId,
-                  hint: const Text('Filtrar por Categoria'),
-                  decoration: const InputDecoration(border: OutlineInputBorder()),
-                  items: [
-                    const DropdownMenuItem(value: null, child: Text('Todas as Categorias')),
-                    ...categories.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))),
-                  ],
-                  onChanged: (value) => setState(() => _selectedCategoryId = value),
-                ),
-                loading: () => const SizedBox.shrink(),
-                error: (e, s) => const Text('Erro ao carregar categorias'),
-              ),
-            ),
-            // --- CONTEÚDO DAS ABAS ---
-            Expanded(
-              child: playersAsyncValue.when(
-                data: (players) {
-                  // Filtra os jogadores pela categoria selecionada
-                  final filteredPlayers = _selectedCategoryId == null
-                      ? players
-                      : players.where((p) => p.categoryId == _selectedCategoryId).toList();
+        // O AppBar foi removido, pois será gerenciado pelo MainScaffold
+        // A TabBar será adicionada ao CustomAppBar no próximo passo.
+        body: playersAsyncValue.when(
+          data: (players) {
+            // Filtra os jogadores ANTES de criar os rankings
+            final filteredPlayers = selectedCategory == null
+                ? players
+                : players.where((p) => p.categoryId == selectedCategory.id).toList();
 
-                  return TabBarView(
-                    children: [
-                      // Aba de Artilharia
-                      _buildRankingList(
-                        players: filteredPlayers,
-                        valueExtractor: (p) => p.goals,
-                        label: 'Gols',
-                      ),
-                      // Aba de Assistências
-                      _buildRankingList(
-                        players: filteredPlayers,
-                        valueExtractor: (p) => p.assists,
-                        label: 'Assist.',
-                      ),
-                      // Aba de Cartões
-                      _buildRankingList(
-                        players: filteredPlayers,
-                        valueExtractor: (p) => p.yellowCards + p.redCards,
-                        label: 'Cartões',
-                        subtitleExtractor: (p) => '${p.yellowCards}A / ${p.redCards}V',
-                      ),
-                    ],
-                  );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, s) => Center(child: Text('Erro ao carregar jogadores: $e')),
-              ),
-            ),
-          ],
+            // O TabBarView agora usa a lista de jogadores já filtrada
+            return TabBarView(
+              children: [
+                // Aba de Artilharia
+                _buildRankingList(
+                  players: filteredPlayers,
+                  valueExtractor: (p) => p.goals,
+                  label: 'Gols',
+                ),
+                // Aba de Assistências
+                _buildRankingList(
+                  players: filteredPlayers,
+                  valueExtractor: (p) => p.assists,
+                  label: 'Assist.',
+                ),
+                // Aba de Cartões
+                _buildRankingList(
+                  players: filteredPlayers,
+                  valueExtractor: (p) => p.yellowCards + p.redCards,
+                  label: 'Cartões',
+                  subtitleExtractor: (p) => '${p.yellowCards}A / ${p.redCards}V',
+                ),
+              ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, s) => Center(child: Text('Erro ao carregar jogadores: $e')),
         ),
       ),
     );
@@ -103,7 +63,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     required String label,
     String Function(Player)? subtitleExtractor,
   }) {
-    // Filtra e ordena a lista
     final rankedPlayers = players.where((p) => valueExtractor(p) > 0).toList()
       ..sort((a, b) => valueExtractor(b).compareTo(valueExtractor(a)));
 

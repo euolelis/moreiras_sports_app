@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/models/news_model.dart';
 import '../../../core/services/firestore_service.dart';
-import '../../../shared/widgets/confirm_dialog.dart'; // 1. Importe o dialog
+import '../../../shared/widgets/confirm_dialog.dart';
 
 final newsStreamProvider = StreamProvider.autoDispose<List<News>>((ref) {
   return ref.watch(firestoreServiceProvider).getNewsStream();
@@ -31,22 +31,36 @@ class ManageNewsScreen extends ConsumerWidget {
           itemCount: newsList.length,
           itemBuilder: (context, index) {
             final news = newsList[index];
+            // --- ListTile ATUALIZADO ---
             return ListTile(
               title: Text(news.title),
               subtitle: Text(DateFormat('dd/MM/yyyy').format(news.createdAt)),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                // 2. Modifique o onPressed para usar o dialog
-                onPressed: () async {
-                  final confirm = await showConfirmDialog(
-                    context: context,
-                    title: 'Confirmar Exclusão',
-                    content: 'Tem certeza que deseja deletar a notícia "${news.title}"?',
-                  );
-                  if (confirm) {
-                    await ref.read(firestoreServiceProvider).deleteNews(news.id);
-                  }
-                },
+              onTap: () => context.go('/admin/edit-news/${news.id}'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // --- BOTÃO DE EDITAR ---
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    tooltip: 'Editar Notícia',
+                    onPressed: () => context.go('/admin/edit-news/${news.id}'),
+                  ),
+                  // --- BOTÃO DE DELETAR (JÁ EXISTENTE) ---
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    tooltip: 'Excluir Notícia',
+                    onPressed: () async {
+                      final confirm = await showConfirmDialog(
+                        context: context,
+                        title: 'Confirmar Exclusão',
+                        content: 'Tem certeza que deseja deletar a notícia "${news.title}"?',
+                      );
+                      if (confirm && context.mounted) {
+                        await ref.read(firestoreServiceProvider).deleteNews(news.id);
+                      }
+                    },
+                  ),
+                ],
               ),
             );
           },

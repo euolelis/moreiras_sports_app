@@ -290,7 +290,7 @@ class FirestoreService {
         .delete();
   }
 
-  // --- SPONSORS ---
+   // --- SPONSORS ---
   Stream<List<Sponsor>> getSponsorsStream() {
     return _db
         .collection('schools')
@@ -300,6 +300,19 @@ class FirestoreService {
         .map((snapshot) =>
             snapshot.docs.map((doc) => Sponsor.fromFirestore(doc)).toList());
   }
+Future<Sponsor> getSponsorById(String sponsorId) async {
+  final docSnapshot = await _db
+      .collection('schools')
+      .doc(_schoolId)
+      .collection('sponsors')
+      .doc(sponsorId)
+      .get();
+  if (docSnapshot.exists) {
+    return Sponsor.fromFirestore(docSnapshot);
+  } else {
+    throw Exception('Patrocinador não encontrado');
+  }
+}
 
   Future<void> setSponsor(Sponsor sponsor) async {
     final docRef = _db
@@ -313,7 +326,10 @@ class FirestoreService {
             id: docRef.id,
             name: sponsor.name,
             logoUrl: sponsor.logoUrl,
-            website: sponsor.website)
+            categoryId: sponsor.categoryId,
+            description: sponsor.description,
+            website: sponsor.website,
+            whatsapp: sponsor.whatsapp)
         : sponsor;
 
     await docRef.set(sponsorToSave.toFirestore());
@@ -327,6 +343,8 @@ class FirestoreService {
         .doc(sponsorId)
         .delete();
   }
+
+  Future getCategoryById(String s) async {}
 }
 
 final firestoreServiceProvider = Provider<FirestoreService>((ref) {

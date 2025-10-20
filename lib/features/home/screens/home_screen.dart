@@ -1,16 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/providers/global_filter_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("MOREIRA'S SPORT"),
+        title: Text(selectedCategory?.name.toUpperCase() ?? "MOREIRA'S SPORT"),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.swap_horiz),
+          tooltip: 'Trocar Categoria',
+          onPressed: () {
+            ref.read(selectedCategoryProvider.notifier).state = null;
+            context.go('/select-category');
+          },
+        ),
         actions: [
+          // --- NOVO BOTÃO "SOBRE" ---
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'Sobre o Clube',
+            onPressed: () {
+              context.go('/about');
+            },
+          ),
+          // --- FIM DO NOVO BOTÃO ---
           IconButton(
             icon: const Icon(Icons.admin_panel_settings_outlined),
             tooltip: 'Acesso Administrativo',
@@ -21,8 +42,8 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: GridView.count(
-        crossAxisCount: 2,
         padding: const EdgeInsets.all(16.0),
+        crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         children: <Widget>[
@@ -54,7 +75,7 @@ class HomeScreen extends StatelessWidget {
           _MenuButton(
             icon: Icons.business,
             label: 'PATROCINADORES',
-            onTap: () => context.go('/sponsors'), // ATIVE AQUI
+            onTap: () => context.go('/sponsors'),
           ),
         ],
       ),
