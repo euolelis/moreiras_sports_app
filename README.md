@@ -1,108 +1,109 @@
-# Moreira's Sports App (Projeto Piloto)
- <!-- TODO: Substitua pela URL de uma imagem do logo -->
+# Moreira's Sports App
 
-## 📖 Sobre o Projeto
+![Flutter Version](https://img.shields.io/badge/Flutter-3.x-blue.svg)
+![Firebase](https://img.shields.io/badge/Firebase-Backend-orange.svg)
+![Riverpod](https://img.shields.io/badge/State%20Management-Riverpod-blueviolet.svg)
 
-Este é o repositório do aplicativo móvel **Moreira's Sports**, o projeto piloto para uma plataforma white-label (SaaS) destinada a escolas de futebol e clubes esportivos amadores. O objetivo é centralizar a comunicação, gestão de elenco, calendário de jogos e estatísticas, profissionalizando a operação do clube e aumentando o engajamento de pais e atletas.
+Aplicativo piloto de gestão para a escola de futebol Moreira's Sports. Este projeto serve como um protótipo funcional para uma futura plataforma SaaS white-label, projetada para ser adaptável a qualquer clube ou escola de futebol.
 
-O aplicativo está sendo desenvolvido em **Flutter** com **Firebase** como backend, garantindo uma experiência multiplataforma (iOS e Android) a partir de um único código-base.
+## 📸 Screenshots
 
----
+*(Substitua estas imagens por capturas de tela reais do seu aplicativo)*
 
-## ✨ Funcionalidades Implementadas (Status Atual)
-
-O projeto está em desenvolvimento ativo. As seguintes funcionalidades já foram implementadas e testadas:
-
-### 👤 Perfil de Administrador
-- [x] **Autenticação Segura:** Sistema de login e logout com Firebase Auth.
-- [x] **Painel de Controle:** Dashboard centralizado para gerenciamento.
-- [x] **Gestão de Categorias (CRUD):**
-  - [x] Criar, visualizar e deletar categorias (ex: Sub-8, Sub-11).
-- [x] **Gestão de Elenco (CRUD):**
-  - [x] Criar, visualizar e editar jogadores.
-  - [x] Associar cada jogador a uma categoria específica.
-  - [x] Fazer upload de foto de perfil para cada jogador.
-- [x] **Gestão de Calendário (CRUD):**
-  - [x] Agendar, visualizar e editar jogos (adversário, campeonato, data, local, status).
-- [x] **Gestão de Estatísticas da Partida (CRUD):**
-  - [x] Acessar detalhes de um jogo.
-  - [x] Lançar eventos da partida (Gols, Assistências).
-  - [x] Atualizar placar final.
-  - [x] As estatísticas totais do jogador (gols, assistências) são atualizadas automaticamente.
-
-### 👥 Perfil de Visitante (Público)
-- [x] **Fluxo de Entrada:**
-  - [x] Splash Screen na inicialização.
-  - [x] Tela de seleção para entrar como "Visitante" ou "Admin".
-- [x] **Navegação Principal:** Estrutura com `BottomNavigationBar` para as seções principais.
-- [x] **Tela Home:** Menu principal com atalhos para as funcionalidades.
-- [x] **Visualização de Elenco:**
-  - [x] Listagem de jogadores.
-  - [x] Tela de detalhes do jogador com foto, dados e estatísticas (layout avançado implementado).
+| Splash Screen | Tela de Entrada | Seleção de Categoria |
+| :-----------: | :-------------: | :------------------: |
+| ![Splash Screen](https://via.placeholder.com/300x650/8B0000/FFFFFF?text=Splash+Screen) | ![Landing Screen](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Landing+Screen) | ![Category Selection](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Category+Selection) |
+| **Home Page** | **Detalhes do Jogador** | **Painel do Admin** |
+| ![Home Page](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Home+Page) | ![Player Detail](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Player+Detail) | ![Admin Dashboard](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Admin+Dashboard) |
 
 ---
 
-## 🚀 Próximos Passos (Roadmap para v1.0)
+## ✅ Funcionalidades Implementadas
 
-- **[x] Finalizar Fluxo de Jogos (Público):**
-  - [x] Criar tela para listar o calendário de jogos.
-  - [x] Criar tela de detalhes do jogo para exibir placar e timeline de eventos.
-- **[x] Implementar Estatísticas (Público):**
-  - [x] Criar tela de rankings (artilharia, assistências).
-- **[x] Implementar Notícias (CRUD Admin + Público):**
-  - [x] Finalizar o ciclo completo para o admin criar e o visitante ler notícias.
-- **[x] Implementar Patrocinadores (CRUD Admin + Público):**
-  - [x] Permitir que o admin cadastre patrocinadores com logo.
-  - [x] Exibir os logos em uma seção pública.
-- **[x] Polimento e Lançamento:**
-  - [x] Refinamento geral da UI/UX.
-  - [x] Geração dos ícones e assets finais.
-  - [x] Build de produção e publicação na Google Play Store.
+### Área Pública (Visitante)
+- [x] **Fluxo de Entrada Completo:** Splash Screen -> Tela de Entrada (Landing) -> Seleção de Categoria.
+- [x] **Filtro Global por Categoria:** A seleção de categoria na tela inicial filtra o conteúdo em todo o aplicativo (Elenco, Jogos, Estatísticas, Patrocinadores).
+- [x] **Home Screen:** Painel de navegação principal com layout em grade e `AppBar` dinâmica que exibe a categoria selecionada.
+- [x] **Elenco:** Lista de jogadores agrupados por categoria usando painéis expansíveis (`ExpansionTile`).
+- [x] **Detalhes do Jogador:** Tela de perfil completa com foto, informações pessoais, estatísticas de desempenho e link para redes sociais.
+- [x] **Calendário de Jogos:** Lista de jogos passados e futuros, filtrada por categoria.
+- [x] **Detalhes do Jogo:** Tela com informações da partida e timeline de eventos (gols, cartões, etc.).
+- [x] **Estatísticas:** Tela com abas para rankings de Artilharia, Assistências e Cartões, filtrados por categoria.
+- [x] **Notícias:** Lista de notícias do clube.
+- [x] **Patrocinadores:** Lista de patrocinadores com logo e nome, filtrada por categoria, com navegação para tela de detalhes.
+- [x] **Sobre o Clube:** Página de informações estáticas acessível pela `AppBar` e `BottomNavigationBar`.
+- [x] **Navegação Centralizada:** `MainScaffold` com `AppBar` e `BottomNavigationBar` consistentes em todas as telas principais.
 
----
+### Área Administrativa (Admin)
+- [x] **Autenticação:** Login de administrador com e-mail e senha via Firebase Auth.
+- [x] **Rotas Protegidas:** Acesso ao painel `/admin` restrito a usuários autenticados.
+- [x] **Painel de Controle:** Dashboard com acesso a todas as seções de gerenciamento.
+- [x] **CRUD de Jogadores:** Adicionar, editar e excluir jogadores, com upload de fotos e edição de todas as estatísticas.
+- [x] **CRUD de Categorias:** Adicionar, editar e excluir categorias de times.
+- [x] **CRUD de Jogos:** Adicionar e editar informações de jogos (adversário, local, data, etc.).
+- [x] **CRUD de Notícias:** Adicionar, editar e excluir notícias, com upload de imagem de capa.
+- [x] **CRUD de Patrocinadores:** Adicionar, editar e excluir patrocinadores, com upload de logo.
+- [x] **Gerenciamento de Partidas:** Tela de detalhes do jogo para lançar eventos em tempo real (gols, assistências, cartões) e atualizar o placar final.
+- [x] **Feedback ao Usuário:** Mensagens de sucesso (`SnackBar`) após salvar ou editar dados.
+- [x] **Segurança:** Diálogos de confirmação para todas as ações de exclusão.
 
-## 🛠️ Tecnologias Utilizadas
-
-*   **Framework:** [Flutter](https://flutter.dev/)
-*   **Linguagem:** [Dart](https://dart.dev/)
-*   **Backend & Database:** [Firebase](https://firebase.google.com/) (Firestore, Authentication, Storage)
-*   **Gerenciamento de Estado:** [Riverpod](https://riverpod.dev/)
-*   **Navegação:** [GoRouter](https://pub.dev/packages/go_router)
-
-## ⚙️ Configuração do Ambiente de Desenvolvimento
-
-Para rodar este projeto localmente, siga os passos abaixo:
-
-1.  **Clone o repositório:**
-    ```bash
-    git clone [URL_DO_SEU_REPOSITORIO_PRIVADO]
-    cd moreiras_sports_app
-    ```
-
-2.  **Instale as dependências do Flutter:**
-    ```bash
-    flutter pub get
-    ```
-
-3.  **Configuração do Firebase:**
-    - Este projeto requer uma configuração do Firebase para funcionar.
-    - Crie um projeto no [console do Firebase](https://console.firebase.google.com/).
-    - Ative os serviços: **Authentication** (com provedor E-mail/Senha), **Firestore Database** e **Storage**.
-    - Instale o Firebase CLI: `npm install -g firebase-tools`.
-    - Faça login: `firebase login`.
-    - Configure o projeto com o FlutterFire: `flutterfire configure`.
-    - Selecione o projeto Firebase que você criou e as plataformas (android, ios). Isso irá gerar o arquivo `lib/firebase_options.dart`.
-
-4.  **Crie um Usuário Admin:**
-    - No console do Firebase, vá para **Authentication > Users** e crie um usuário com e-mail e senha para poder acessar o painel de administrador.
-
-5.  **Rode o aplicativo:**
-    ```bash
-    flutter run
-    ```
+### Geral e Técnico
+- [x] **Tema Customizado:** Tema escuro (`dark theme`) consistente em todo o aplicativo.
+- [x] **Gerenciamento de Estado:** Utilização de Riverpod para um gerenciamento de estado reativo e escalável.
+- [x] **Navegação:** Roteamento robusto e declarativo com GoRouter, suportando rotas aninhadas e passagem de parâmetros.
+- [x] **Backend:** Integração completa com Firebase (Authentication, Firestore, Storage).
+- [x] **Suporte Multiplataforma:** Lógica de upload de imagem compatível com Web e Mobile.
+- [x] **Localização:** Configuração para `pt_BR`, garantindo que widgets nativos (como `DatePicker`) apareçam em português.
 
 ---
 
-## 🤝 Contribuições
+## 🚀 Stack de Tecnologias
 
-Este é um projeto privado. Para contribuições, por favor, entre em contato com o mantenedor do repositório.
+- **Framework:** Flutter
+- **Linguagem:** Dart
+- **Backend:** Firebase (Authentication, Firestore, Storage)
+- **Gerenciamento de Estado:** Riverpod
+- **Navegação:** GoRouter
+- **UI & Utilitários:**
+  - `cached_network_image`: Para exibição e cache de imagens da internet.
+  - `image_picker`: Para seleção de imagens da galeria/câmera.
+  - `url_launcher`: Para abrir links externos (redes sociais, sites).
+  - `intl`: Para formatação de datas.
+  - `lottie`: Para animações (usado na Splash Screen).
+  - `flutter_localizations`: Para internacionalização.
+
+---
+
+## 📂 Estrutura do Projeto
+
+O projeto segue uma arquitetura limpa, separando as responsabilidades em camadas:
+
+```
+lib/
+├── core/
+│   ├── models/         # Modelos de dados (Player, Game, etc.)
+│   ├── services/       # Serviços de backend (Firestore, Auth, Storage)
+│   └── providers/      # Providers globais (ex: filtro de categoria)
+├── features/
+│   ├── admin/          # Telas e widgets da área administrativa
+│   ├── auth/           # Telas de autenticação (Login, Landing)
+│   ├── home/           # Tela principal e de seleção de categoria
+│   └── ...             # Outras features (players, games, news, etc.)
+├── navigation/
+│   └── app_router.dart # Configuração centralizada do GoRouter
+└── shared/
+    ├── theme/          # Tema do aplicativo (cores, fontes)
+    └── widgets/        # Widgets reutilizáveis (MainScaffold, Dialogs)
+```
+
+---
+
+## 📋 Checklist Técnico: Controle de Versão e Documentação (Git)
+
+Este checklist serve para garantir as boas práticas de versionamento e documentação do projeto.
+
+- [x] **Repositório no GitHub:** O projeto está versionado em um repositório Git remoto.
+- [x] **Commits Semânticos:** As mensagens de commit seguem um padrão para facilitar a leitura do histórico (ex: `feat:`, `fix:`, `refactor:`, `docs:`).
+- [ ] **Estratégia de Branches:** Adotar uma estratégia como Git Flow (`main`, `develop`, `feature/nome-da-feature`) para organizar o desenvolvimento de novas funcionalidades e correções.
+- [x] **README.md Detalhado:** Este documento existe e está atualizado com as informações essenciais do projeto.
+- [x] **`.gitignore` Configurado:** O arquivo `.gitignore` padrão do Flutter está em uso para evitar o versionamento de arquivos gerados e sensíveis.

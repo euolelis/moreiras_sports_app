@@ -11,8 +11,28 @@ class HomeScreen extends ConsumerWidget {
     final selectedCategory = ref.watch(selectedCategoryProvider);
 
     return Scaffold(
+      // --- NOVA APPBAR CUSTOMIZADA ---
       appBar: AppBar(
-        title: Text(selectedCategory?.name.toUpperCase() ?? "MOREIRA'S SPORT"),
+        elevation: 0,
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "MOREIRA'S SPORT",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+            ),
+            const SizedBox(height: 2),
+            if (selectedCategory != null)
+              Text(
+                selectedCategory.name.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.amber[600],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+          ],
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.swap_horiz),
@@ -23,24 +43,20 @@ class HomeScreen extends ConsumerWidget {
           },
         ),
         actions: [
-          // --- NOVO BOTÃO "SOBRE" ---
           IconButton(
             icon: const Icon(Icons.info_outline),
             tooltip: 'Sobre o Clube',
-            onPressed: () {
-              context.go('/about');
-            },
+            onPressed: () => context.go('/about'),
           ),
-          // --- FIM DO NOVO BOTÃO ---
           IconButton(
             icon: const Icon(Icons.admin_panel_settings_outlined),
             tooltip: 'Acesso Administrativo',
-            onPressed: () {
-              context.go('/admin-login');
-            },
+            onPressed: () => context.go('/admin-login'),
           ),
         ],
       ),
+      // --- FIM DA NOVA APPBAR ---
+      
       body: GridView.count(
         padding: const EdgeInsets.all(16.0),
         crossAxisCount: 2,

@@ -61,7 +61,7 @@ class _ManagePlayersScreenState extends ConsumerState<ManagePlayersScreen> {
               final categoriesAsync = ref.watch(categoriesStreamProvider);
               return categoriesAsync.when(
                 data: (categories) => DropdownButtonFormField<String?>(
-                  value: _selectedCategoryId,
+                  initialValue: _selectedCategoryId,
                   hint: const Text('Filtrar por Categoria'),
                   decoration: const InputDecoration(border: OutlineInputBorder()),
                   items: [

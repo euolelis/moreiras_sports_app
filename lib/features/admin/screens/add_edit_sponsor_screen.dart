@@ -143,7 +143,7 @@ class _SponsorFormState extends ConsumerState<_SponsorForm> {
                     final categoriesAsync = ref.watch(categoriesStreamProvider);
                     return categoriesAsync.when(
                       data: (categories) => DropdownButtonFormField<String>(
-                        value: _selectedCategoryId,
+                        initialValue: _selectedCategoryId,
                         hint: const Text('Selecione a Categoria'),
                         decoration: const InputDecoration(labelText: 'Categoria', border: OutlineInputBorder()),
                         items: [

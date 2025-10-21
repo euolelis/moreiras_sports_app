@@ -42,7 +42,7 @@ class PlayerListCard extends StatelessWidget {
         // 2. ATUALIZE A NAVEGAÇÃO AQUI
         onTap: () {
           // Navega para a rota de detalhes, passando o ID do jogador na URL.
-          context.go('/players/${player.id}');
+          context.push('/players/${player.id}');
         },
       ),
     );

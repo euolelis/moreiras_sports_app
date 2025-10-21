@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:go_router/go_router.dart'; // Importe o GoRouter
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/models/player_model.dart';
@@ -51,7 +51,8 @@ class PlayerDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        // Adiciona um botão de voltar explícito com a cor branca para garantir visibilidade
+        leading: const BackButton(color: Colors.white),
       ),
       body: playerAsyncValue.when(
         data: (player) {
@@ -137,7 +138,6 @@ class PlayerDetailScreen extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _ActionButton(icon: Icons.photo_library, label: 'FOTOS/VÍDEOS', onTap: () {}),
-                            // --- onTap ATIVADO AQUI ---
                             _ActionButton(
                               icon: Icons.bar_chart,
                               label: 'ESTATÍSTICAS',

@@ -21,7 +21,6 @@ class PlayerListScreen extends ConsumerWidget {
     final selectedCategory = ref.watch(selectedCategoryProvider);
 
     return Scaffold(
-      // A AppBar foi removida daqui.
       body: categoriesAsyncValue.when(
         data: (allCategories) {
           return playersAsyncValue.when(
@@ -51,7 +50,11 @@ class PlayerListScreen extends ConsumerWidget {
                       ),
                       children: playersInCategory.isNotEmpty
                           ? playersInCategory.map((player) {
-                              return PlayerListCard(player: player);
+                              // --- PADDING ADICIONADO AQUI ---
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                child: PlayerListCard(player: player),
+                              );
                             }).toList()
                           : [
                               const ListTile(

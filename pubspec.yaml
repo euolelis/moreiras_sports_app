@@ -8,7 +8,7 @@ name: moreiras_sports_app
 description: Aplicativo de gestão para a escola de futebol Moreira's Sports, servindo como projeto piloto para uma plataforma SaaS white-label.
 
 publish_to: 'none'
-version: 1.0.1+7
+version: 1.0.3+9
 
 # ===================================================================
 #  AMBIENTE DE DESENVOLVIMENTO
