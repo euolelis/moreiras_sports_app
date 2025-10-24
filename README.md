@@ -8,11 +8,11 @@ Aplicativo piloto de gestão para a escola de futebol Moreira's Sports. Este pro
 
 ## 📸 Screenshots
 
-*(Substitua estas imagens por capturas de tela reais do seu aplicativo)*
 
 | Splash Screen | Tela de Entrada | Seleção de Categoria |
 | :-----------: | :-------------: | :------------------: |
-| ![Splash Screen](https://via.placeholder.com/300x650/8B0000/FFFFFF?text=Splash+Screen) | ![Landing Screen](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Landing+Screen) | ![Category Selection](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Category+Selection) |
+| ![Splash Screen]<img width="1000" height="1000" alt="TELA 1" src="https://github.com/user-attachments/assets/ea196d56-164d-4306-9359-c38fdc6686a7" />
+(https://via.placeholder.com/300x650/8B0000/FFFFFF?text=Splash+Screen) | ![Landing Screen](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Landing+Screen) | ![Category Selection](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Category+Selection) |
 | **Home Page** | **Detalhes do Jogador** | **Painel do Admin** |
 | ![Home Page](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Home+Page) | ![Player Detail](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Player+Detail) | ![Admin Dashboard](https://via.placeholder.com/300x650/1a1a1a/FFFFFF?text=Admin+Dashboard) |
 
